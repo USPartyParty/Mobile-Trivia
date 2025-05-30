@@ -1,0 +1,379 @@
+/*
+ * Taps Tokens Trivia - Mobile Interface Styles
+ * Main stylesheet for the rider's phone interface
+ */
+
+/* Tailwind CSS Imports */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS Variables for Mobile Branding & Layout */
+:root {
+  /* Consistent Color Palette with Tablet */
+  --color-primary: #4f46e5;         /* Indigo 600 */
+  --color-primary-light: #818cf8;   /* Indigo 400 */
+  --color-primary-dark: #3730a3;    /* Indigo 800 */
+  --color-secondary: #ec4899;       /* Pink 500 */
+  --color-secondary-light: #f472b6; /* Pink 400 */
+  --color-secondary-dark: #be185d;  /* Pink 700 */
+
+  --color-background: #f9fafb;      /* Gray 50 - Main background for mobile */
+  --color-surface: #ffffff;         /* White - Card/surface background */
+  --color-text: #1f2937;            /* Gray 800 - Primary text */
+  --color-text-light: #6b7280;      /* Gray 500 - Secondary text */
+  --color-border: #e5e7eb;          /* Gray 200 - Default border */
+
+  --color-success: #10b981;         /* Emerald 500 */
+  --color-error: #ef4444;           /* Red 500 */
+  --color-warning: #f59e0b;         /* Amber 500 */
+  --color-info: #3b82f6;            /* Blue 500 */
+
+  /* Typography (slightly smaller base for mobile) */
+  --font-primary: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-display: 'Montserrat', var(--font-primary);
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --mobile-text-base: 15px; /* Slightly smaller base font for mobile */
+  --mobile-text-lg: 1.125rem; /* 18px */
+  --mobile-text-xl: 1.25rem;  /* 20px */
+
+  /* Spacing & Sizing for Mobile */
+  --mobile-header-height: 3.5rem; /* 56px */
+  --mobile-footer-height: 4rem;   /* 64px, can be taller for nav buttons */
+  --mobile-border-radius: 0.5rem; /* 8px */
+  --mobile-padding: 1rem;         /* 16px */
+  --mobile-tap-target-size: 44px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+
+  /* Z-index layers */
+  --z-background: -10;
+  --z-default: 1;
+  --z-header: 100; /* Header should be on top */
+  --z-footer: 100; /* Footer navigation */
+  --z-modal: 150;
+  --z-toast: 200; /* Toasts should be above everything */
+}
+
+/* Base Styles for Mobile */
+@layer base {
+  html {
+    @apply text-[var(--mobile-text-base)] antialiased touch-manipulation;
+    font-family: var(--font-primary);
+    color: var(--color-text);
+    background-color: var(--color-background);
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS/Webkit */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply m-0 p-0 min-h-screen w-full overflow-x-hidden;
+    font-size: var(--mobile-text-base);
+  }
+
+  /* Make sure content fills the viewport, considering safe areas */
+  #root {
+    @apply flex flex-col min-h-screen;
+    padding-top: env(safe-area-inset-top, 0);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    @apply font-bold leading-tight;
+  }
+
+  h1 { @apply text-2xl sm:text-3xl; } /* 24px / 30px */
+  h2 { @apply text-xl sm:text-2xl; } /* 20px / 24px */
+  h3 { @apply text-lg sm:text-xl; } /* 18px / 20px */
+  h4 { @apply text-base sm:text-lg; } /* 16px / 18px */
+
+  a {
+    @apply text-indigo-600 hover:text-indigo-700 transition-colors duration-150;
+    text-decoration: none;
+  }
+
+  /* Enhanced focus styles for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-indigo-500 ring-offset-2 ring-offset-[var(--color-background)];
+  }
+
+  button, [role="button"], input[type="submit"], input[type="button"] {
+    @apply cursor-pointer;
+    -webkit-appearance: none; /* Remove default iOS styling */
+    appearance: none;
+  }
+
+  /* Subtle scrollbar for web views on mobile if scrollable areas exist */
+  ::-webkit-scrollbar {
+    @apply w-1.5 h-1.5;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
+  }
+}
+
+/* Mobile-Optimized Component Styles */
+@layer components {
+  /* Main App Layout */
+  .mobile-app-container {
+    @apply flex flex-col min-h-screen w-full bg-[var(--color-background)];
+  }
+
+  .mobile-header {
+    @apply fixed top-0 left-0 right-0 h-[var(--mobile-header-height)] bg-[var(--color-surface)] shadow-sm
+           flex items-center justify-between px-[var(--mobile-padding)] z-[var(--z-header)];
+    padding-top: env(safe-area-inset-top, 0); /* Adjust for notches */
+  }
+
+  .mobile-content {
+    @apply flex-1 pt-[var(--mobile-header-height)] pb-[var(--mobile-footer-height)] px-[var(--mobile-padding)]
+           flex flex-col w-full;
+  }
+
+  .mobile-footer {
+    @apply fixed bottom-0 left-0 right-0 h-[var(--mobile-footer-height)] bg-[var(--color-surface)] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]
+           flex items-center justify-around px-[var(--mobile-padding)] z-[var(--z-footer)];
+    padding-bottom: env(safe-area-inset-bottom, 0); /* Adjust for home bar */
+  }
+
+  /* Card for mobile */
+  .mobile-card {
+    @apply bg-[var(--color-surface)] rounded-[var(--mobile-border-radius)] shadow-md overflow-hidden w-full;
+  }
+  .mobile-card-header {
+    @apply p-[var(--mobile-padding)] border-b border-[var(--color-border)] flex items-center justify-between;
+  }
+  .mobile-card-body {
+    @apply p-[var(--mobile-padding)];
+  }
+  .mobile-card-footer {
+    @apply p-[var(--mobile-padding)] border-t border-[var(--color-border)] flex items-center justify-end;
+  }
+
+  /* Buttons with good tap targets */
+  .btn {
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-[var(--mobile-border-radius)]
+           font-medium text-base leading-snug
+           transition-all var(--transition-fast)
+           focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500
+           disabled:opacity-60 disabled:cursor-not-allowed;
+    min-height: var(--mobile-tap-target-size);
+  }
+  .btn-primary {
+    @apply bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800;
+  }
+  .btn-secondary {
+    @apply bg-pink-500 text-white hover:bg-pink-600 active:bg-pink-700;
+  }
+  .btn-outline {
+    @apply border-2 border-indigo-500 text-indigo-600 hover:bg-indigo-50 active:bg-indigo-100;
+  }
+  .btn-success {
+    @apply bg-emerald-500 text-white hover:bg-emerald-600 active:bg-emerald-700;
+  }
+  .btn-danger {
+    @apply bg-red-500 text-white hover:bg-red-600 active:bg-red-700;
+  }
+  .btn-lg {
+    @apply px-6 py-3 text-lg;
+  }
+  .btn-sm {
+    @apply px-4 py-2 text-sm;
+    min-height: calc(var(--mobile-tap-target-size) * 0.85);
+  }
+  .btn-full {
+    @apply w-full;
+  }
+
+  /* Form Inputs */
+  .form-label {
+    @apply block text-sm font-medium text-slate-700 mb-1;
+  }
+  .form-input {
+    @apply block w-full px-4 py-2.5 rounded-[var(--mobile-border-radius)] border border-slate-300
+           bg-white text-slate-900 placeholder-slate-400
+           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+           transition-colors duration-150;
+    min-height: var(--mobile-tap-target-size);
+  }
+  .form-input-error {
+    @apply border-red-500 ring-red-500;
+  }
+  .form-error-text {
+    @apply text-xs text-red-600 mt-1;
+  }
+
+  /* QR Scanner Area */
+  .qr-scanner-container {
+    @apply w-full max-w-xs mx-auto aspect-square rounded-lg overflow-hidden border-2 border-dashed border-slate-300 relative;
+  }
+  #qr-reader { /* Specific ID used by html5-qrcode library */
+    @apply w-full h-full;
+  }
+
+  /* Game Play Styles */
+  .game-question-text {
+    @apply text-xl font-semibold text-center my-6 text-slate-800;
+  }
+  .answer-options-grid {
+    @apply grid grid-cols-1 gap-3;
+  }
+  .answer-option-mobile {
+    @apply btn btn-outline text-left justify-start w-full py-3 px-4 text-base;
+  }
+  .answer-option-mobile.selected {
+    @apply bg-indigo-100 border-indigo-500 text-indigo-700 font-semibold;
+  }
+  .answer-option-mobile.correct {
+    @apply bg-emerald-100 border-emerald-500 text-emerald-700 font-semibold;
+  }
+  .answer-option-mobile.incorrect {
+    @apply bg-red-100 border-red-500 text-red-700 font-semibold;
+  }
+
+  /* Score and Timer displays */
+  .score-badge {
+    @apply px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm font-medium;
+  }
+  .timer-display {
+    @apply text-2xl font-bold text-indigo-600;
+  }
+  .mobile-timer-bar {
+    @apply h-1.5 w-full bg-slate-200 rounded-full overflow-hidden my-4;
+  }
+  .mobile-timer-progress {
+    @apply h-full bg-sky-500 transition-all duration-100 ease-linear;
+  }
+
+  /* Results Page */
+  .results-player-score {
+    @apply text-4xl font-bold text-amber-500 my-2;
+  }
+  .results-stat-item {
+    @apply flex justify-between items-center py-2 border-b border-slate-200;
+  }
+}
+
+/* Mobile-Specific Utility Classes */
+@layer utilities {
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+  .content-spacing-mobile {
+    @apply px-4 py-5 sm:px-5 sm:py-6;
+  }
+  .text-balance { /* For balancing text lines, good for titles */
+    text-wrap: balance;
+  }
+  .no-select { /* Prevent text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  .visually-hidden { /* For accessibility, hide visually but keep for screen readers */
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes pulseOnce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.animate-pulse-once {
+  animation: pulseOnce 0.5s ease-in-out;
+}
+
+/* Dark Mode Styles */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #111827;      /* Gray 900 */
+    --color-surface: #1f2937;         /* Gray 800 */
+    --color-text: #f3f4f6;            /* Gray 100 */
+    --color-text-light: #9ca3af;      /* Gray 400 */
+    --color-border: #374151;          /* Gray 700 */
+  }
+
+  .mobile-card {
+    @apply bg-[var(--color-surface)] border border-[var(--color-border)];
+  }
+  .mobile-card-header, .mobile-card-footer {
+    @apply border-[var(--color-border)];
+  }
+
+  .form-input {
+    @apply bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-500;
+    @apply focus:bg-slate-600;
+  }
+  .form-label {
+    @apply text-slate-300;
+  }
+
+  .btn-outline {
+    @apply border-indigo-500 text-indigo-400 hover:bg-indigo-900/50 active:bg-indigo-900/70;
+  }
+
+  .answer-option-mobile {
+    @apply border-slate-600 text-slate-200 hover:bg-slate-700;
+  }
+  .answer-option-mobile.selected {
+    @apply bg-indigo-700/50 border-indigo-500 text-indigo-300;
+  }
+  .answer-option-mobile.correct {
+    @apply bg-emerald-700/50 border-emerald-500 text-emerald-300;
+  }
+  .answer-option-mobile.incorrect {
+    @apply bg-red-700/50 border-red-500 text-red-300;
+  }
+
+  .score-badge {
+    @apply bg-amber-900/50 text-amber-300;
+  }
+
+  .mobile-timer-bar {
+    @apply bg-slate-700;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-600;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-500;
+  }
+}
