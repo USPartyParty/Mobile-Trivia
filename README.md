@@ -161,4 +161,4 @@ Pull requests are welcome! Please open issues for feature proposals or bugs. All
 ---
 
 ## License
-MIT © 2025 Korey Streich
+MIT © 2025 KC Strike
