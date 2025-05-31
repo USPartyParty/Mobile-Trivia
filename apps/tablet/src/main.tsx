@@ -1,10 +1,11 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { StrictMode } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { SocketProvider } from './context/SocketContext';
 import { GameStateProvider } from './context/GameStateContext';
 import { ToastProvider } from './context/ToastContext';
+// …etc…
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -48,7 +49,7 @@ const root = createRoot(container);
 
 // Render app
 root.render(
-  <React.StrictMode>
+  <StrictMode>
     <ErrorBoundary>
       <ToastProvider>
         <SocketProvider>
@@ -70,7 +71,7 @@ root.render(
         </SocketProvider>
       </ToastProvider>
     </ErrorBoundary>
-  </React.StrictMode>
+  </StrictMode>
 );
 
 // Register service worker for production builds
