@@ -1,5 +1,5 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { StrictMode } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Context Providers (assuming similar structure to tablet, adjust paths as needed)
@@ -51,7 +51,7 @@ const root = createRoot(container);
 
 // Render the mobile application
 root.render(
-  <React.StrictMode>
+  <StrictMode>
     <ErrorBoundary>
       <ToastProvider defaultPosition="top-center" maxToasts={3}>
         <SocketProvider>
@@ -73,7 +73,7 @@ root.render(
         </SocketProvider>
       </ToastProvider>
     </ErrorBoundary>
-  </React.StrictMode>
+  </StrictMode>
 );
 
 // PWA Service Worker Registration
