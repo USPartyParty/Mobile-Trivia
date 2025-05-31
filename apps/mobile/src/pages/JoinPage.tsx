@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
-import { useGameState } from '../../context/GameStateContext';
-import { useSocket } from '../../context/SocketContext';
-import { useToast } from '../../context/ToastContext';
+import { useGameState } from '../context/GameStateContext';
+import { useSocket } from '../context/SocketContext';
+import { useToast } from '../context/ToastContext';
 import {
   QrCodeIcon,
   UserIcon,
