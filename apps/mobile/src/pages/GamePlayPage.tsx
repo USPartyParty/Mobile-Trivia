@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGameState, Question } from '../context/GameStateContext'; // Assuming Question type is exported
 import { useSocket } from '../context/SocketContext';
-import { useToast } from '../ontext/ToastContext';
+import { useToast } from '../context/ToastContext';
 import {
   ClockIcon,
   CheckCircleIcon,
