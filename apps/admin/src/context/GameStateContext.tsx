@@ -184,7 +184,11 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const response = await fetch(`${API_URL}/api/session/${sessionId}`);
+      const response = await fetch(`${API_URL}/api/session/${sessionId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`
+        }
+      });
       
       if (!response.ok) {
         throw new Error(`Failed to fetch session: ${response.statusText}`);
@@ -215,7 +219,7 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const response = await fetch(`${API_URL}/api/admin/stats`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
+          'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`
         },
       });
       
