@@ -24,7 +24,9 @@
     "winston": "^3.11.0",
     "compression": "^1.7.4",
     "express-rate-limit": "^7.1.5",
-    "joi": "^17.11.0"
+    "joi": "^17.11.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "eslint": "^8.56.0",

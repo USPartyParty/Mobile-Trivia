@@ -11,6 +11,13 @@ const { v4: uuidv4 } = require('uuid');
 const Joi = require('joi');
 const { Session } = require('../models/session');
 
+/**
+ * @swagger
+ * tags:
+ *   name: Session
+ *   description: API for managing game sessions
+ */
+
 // Validation schemas
 const createSessionSchema = Joi.object({
   driverId: Joi.string().trim().optional(),
@@ -50,9 +57,48 @@ const authenticateAdmin = (req, res, next) => {
 };
 
 /**
- * @route   POST /api/session
- * @desc    Create a new game session
- * @access  Public
+ * @swagger
+ * /session:
+ *   post:
+ *     summary: Create a new game session
+ *     tags: [Session]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               driverId:
+ *                 type: string
+ *               maxPlayers:
+ *                 type: integer
+ *                 default: 4
+ *               questionCount:
+ *                 type: integer
+ *                 default: 10
+ *               categories:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               difficulty:
+ *                 type: string
+ *                 enum: [easy, medium, hard, mixed]
+ *                 default: mixed
+ *               timeLimit:
+ *                 type: integer
+ *                 default: 30
+ *     responses:
+ *       201:
+ *         description: Session created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Session'
+ *       400:
+ *         description: Invalid request body
+ *       500:
+ *         description: Server error
  */
 router.post('/', async (req, res) => {
   try {
@@ -121,9 +167,34 @@ router.post('/', async (req, res) => {
 });
 
 /**
- * @route   GET /api/session/:id
- * @desc    Get session details
- * @access  Public (basic info) / Admin (full details)
+ * @swagger
+ * /session/{id}:
+ *   get:
+ *     summary: Get session details
+ *     tags: [Session]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Session ID
+ *       - in: header
+ *         name: x-admin-token
+ *         schema:
+ *           type: string
+ *         description: Admin token for full details
+ *     responses:
+ *       200:
+ *         description: Session details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Session'
+ *       404:
+ *         description: Session not found
+ *       500:
+ *         description: Server error
  */
 router.get('/:id', async (req, res) => {
   try {
@@ -190,9 +261,35 @@ router.get('/:id', async (req, res) => {
 });
 
 /**
- * @route   DELETE /api/session/:id
- * @desc    End/reset a session (admin only)
- * @access  Admin
+ * @swagger
+ * /session/{id}:
+ *   delete:
+ *     summary: End a session (admin only)
+ *     tags: [Session]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Session ID
+ *       - in: header
+ *         name: x-admin-token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Admin token
+ *     responses:
+ *       200:
+ *         description: Session ended successfully
+ *       401:
+ *         description: Admin token is required
+ *       403:
+ *         description: Invalid admin token
+ *       404:
+ *         description: Session not found
+ *       500:
+ *         description: Server error
  */
 router.delete('/:id', authenticateAdmin, async (req, res) => {
   try {
@@ -243,9 +340,46 @@ router.delete('/:id', authenticateAdmin, async (req, res) => {
 });
 
 /**
- * @route   POST /api/session/:id/reset
- * @desc    Reset a session for new players (admin only)
- * @access  Admin
+ * @swagger
+ * /session/{id}/reset:
+ *   post:
+ *     summary: Reset a session for new players (admin only)
+ *     tags: [Session]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Session ID to reset
+ *       - in: header
+ *         name: x-admin-token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Admin token
+ *     responses:
+ *       200:
+ *         description: Session reset successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 oldSessionId:
+ *                   type: string
+ *                 newSessionId:
+ *                   type: string
+ *                 qrCodeUrl:
+ *                   type: string
+ *       401:
+ *         description: Admin token is required
+ *       403:
+ *         description: Invalid admin token
+ *       404:
+ *         description: Session not found
+ *       500:
+ *         description: Server error
  */
 router.post('/:id/reset', authenticateAdmin, async (req, res) => {
   try {
@@ -343,9 +477,34 @@ router.post('/:id/reset', authenticateAdmin, async (req, res) => {
 });
 
 /**
- * @route   GET /api/session/:id/qr
- * @desc    Get QR code URL for a session
- * @access  Public
+ * @swagger
+ * /session/{id}/qr:
+ *   get:
+ *     summary: Get QR code URL for a session
+ *     tags: [Session]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Session ID
+ *     responses:
+ *       200:
+ *         description: QR code URL
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 sessionId:
+ *                   type: string
+ *                 qrCodeUrl:
+ *                   type: string
+ *       404:
+ *         description: Session not found
+ *       500:
+ *         description: Server error
  */
 router.get('/:id/qr', async (req, res) => {
   try {
@@ -378,9 +537,38 @@ router.get('/:id/qr', async (req, res) => {
 });
 
 /**
- * @route   GET /api/session/active
- * @desc    Get all active sessions (admin only)
- * @access  Admin
+ * @swagger
+ * /session/active:
+ *   get:
+ *     summary: Get all active sessions (admin only)
+ *     tags: [Session]
+ *     parameters:
+ *       - in: header
+ *         name: x-admin-token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Admin token
+ *     responses:
+ *       200:
+ *         description: List of active sessions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                 sessions:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/SessionSummary'
+ *       401:
+ *         description: Admin token is required
+ *       403:
+ *         description: Invalid admin token
+ *       500:
+ *         description: Server error
  */
 router.get('/active', authenticateAdmin, async (req, res) => {
   try {
@@ -409,3 +597,82 @@ router.get('/active', authenticateAdmin, async (req, res) => {
 });
 
 module.exports = router;
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     SessionSettings:
+ *       type: object
+ *       properties:
+ *         driverId:
+ *           type: string
+ *         maxPlayers:
+ *           type: integer
+ *         questionCount:
+ *           type: integer
+ *         categories:
+ *           type: array
+ *           items:
+ *             type: string
+ *         difficulty:
+ *           type: string
+ *         timeLimit:
+ *           type: integer
+ *     Player:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         name:
+ *           type: string
+ *         score:
+ *           type: integer
+ *         isActive:
+ *           type: boolean
+ *     Question:
+ *       type: object
+ *       # Define Question properties here if needed for detailed session response
+ *     Session:
+ *       type: object
+ *       properties:
+ *         sessionId:
+ *           type: string
+ *         qrCodeUrl:
+ *           type: string
+ *         status:
+ *           type: string
+ *           enum: [waiting, active, completed, error]
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         playerCount:
+ *           type: integer
+ *         players:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Player'
+ *         currentQuestion:
+ *           # Could be an object or integer index depending on your data structure
+ *           type: object # or integer
+ *         questions:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Question' # If you define Question schema
+ *         settings:
+ *           $ref: '#/components/schemas/SessionSettings'
+ *     SessionSummary:
+ *       type: object
+ *       properties:
+ *         sessionId:
+ *           type: string
+ *         status:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         playerCount:
+ *           type: integer
+ *         qrCodeUrl:
+ *           type: string
+ */

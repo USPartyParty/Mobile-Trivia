@@ -14,9 +14,57 @@ const os = require('os');
 const startTime = Date.now();
 
 /**
- * @route   GET /api/health
- * @desc    Get system health status
- * @access  Public
+ * @swagger
+ * tags:
+ *   name: Health
+ *   description: API for system health checks
+ */
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Get system health status
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: System health status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                 service:
+ *                   type: string
+ *                   example: Taps Tokens Trivia API
+ *                 uptime:
+ *                   type: object
+ *                   properties:
+ *                     seconds:
+ *                       type: integer
+ *                     formatted:
+ *                       type: string
+ *                 database:
+ *                   type: object
+ *                   properties:
+ *                     status:
+ *                       type: string
+ *                     statusCode:
+ *                       type: integer
+ *                 activeSessions:
+ *                   type: integer
+ *                 memory:
+ *                   type: object
+ *                 environment:
+ *                   type: object
+ *       500:
+ *         description: Server error
  */
 router.get('/', async (req, res) => {
   try {
@@ -80,9 +128,47 @@ router.get('/', async (req, res) => {
 });
 
 /**
- * @route   GET /api/health/db
- * @desc    Get detailed database status
- * @access  Public
+ * @swagger
+ * /health/db:
+ *   get:
+ *     summary: Get detailed database status
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Detailed database status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 database:
+ *                   type: object
+ *                   properties:
+ *                     status:
+ *                       type: string
+ *                     statusCode:
+ *                       type: integer
+ *                     uri:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     collections:
+ *                       type: integer
+ *                     documents:
+ *                       type: integer
+ *                     dataSize:
+ *                       type: string
+ *                     storageSize:
+ *                       type: string
+ *                     indexes:
+ *                       type: integer
+ *                     indexSize:
+ *                       type: string
+ *       500:
+ *         description: Server error
  */
 router.get('/db', async (req, res) => {
   try {
