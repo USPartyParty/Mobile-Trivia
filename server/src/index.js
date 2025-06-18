@@ -26,6 +26,10 @@ const rateLimit = require('express-rate-limit');
 const winston = require('winston');
 const { v4: uuidv4 } = require('uuid');
 
+// Swagger
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+
 // Initialize Express app
 const app = express();
 const server = http.createServer(app);
@@ -107,6 +111,28 @@ const leaderboardRoutes = require('./routes/leaderboard');
 app.use('/api/health', healthRoutes);
 app.use('/api/session', sessionRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
+
+// Swagger API documentation setup
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Taps Tokens Trivia API',
+      version: '1.0.0',
+      description: 'API documentation for the Taps Tokens Trivia game server.',
+    },
+    servers: [
+      {
+        url: `http://localhost:${process.env.PORT || 3000}/api`,
+        description: 'Development server',
+      },
+    ],
+  },
+  apis: ['./src/routes/*.js'], // Path to the API docs
+};
+
+const swaggerSpecs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {

@@ -10,6 +10,13 @@ const router = express.Router();
 const Joi = require('joi');
 const { Leaderboard } = require('../models/leaderboard');
 
+/**
+ * @swagger
+ * tags:
+ *   name: Leaderboard
+ *   description: API for managing game leaderboards
+ */
+
 // Validation schemas
 const submitScoreSchema = Joi.object({
   alias: Joi.string().trim().min(2).max(20).required()
@@ -53,9 +60,30 @@ const paginationSchema = Joi.object({
 });
 
 /**
- * @route   POST /api/leaderboard
- * @desc    Submit a new score to the leaderboard
- * @access  Public
+ * @swagger
+ * /leaderboard:
+ *   post:
+ *     summary: Submit a new score to the leaderboard
+ *     tags: [Leaderboard]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ScoreSubmission'
+ *     responses:
+ *       201:
+ *         description: Score submitted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ScoreResponse'
+ *       400:
+ *         description: Invalid request body
+ *       409:
+ *         description: Duplicate submission with higher or equal score
+ *       500:
+ *         description: Server error
  */
 router.post('/', async (req, res) => {
   try {
@@ -146,9 +174,44 @@ router.post('/', async (req, res) => {
 });
 
 /**
- * @route   GET /api/leaderboard/top/:n
- * @desc    Get top N scores from the leaderboard
- * @access  Public
+ * @swagger
+ * /leaderboard/top/{n}:
+ *   get:
+ *     summary: Get top N scores from the leaderboard
+ *     tags: [Leaderboard]
+ *     parameters:
+ *       - in: path
+ *         name: n
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *         required: true
+ *         description: Number of top scores to retrieve
+ *       - in: query
+ *         name: period
+ *         schema:
+ *           type: string
+ *           enum: [day, week, month, year, all-time]
+ *         description: Time period for the leaderboard (e.g., day, week)
+ *     responses:
+ *       200:
+ *         description: Top N scores
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 period:
+ *                   type: string
+ *                 scores:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/LeaderboardEntry'
+ *       400:
+ *         description: Invalid parameter n
+ *       500:
+ *         description: Server error
  */
 router.get('/top/:n', async (req, res) => {
   try {
@@ -218,9 +281,45 @@ router.get('/top/:n', async (req, res) => {
 });
 
 /**
- * @route   GET /api/leaderboard/recent
- * @desc    Get recent scores with pagination
- * @access  Public
+ * @swagger
+ * /leaderboard/recent:
+ *   get:
+ *     summary: Get recent scores with pagination
+ *     tags: [Leaderboard]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
+ *         description: Number of scores per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number
+ *     responses:
+ *       200:
+ *         description: Recent scores with pagination
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 scores:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/LeaderboardEntry'
+ *                 pagination:
+ *                   $ref: '#/components/schemas/Pagination'
+ *       400:
+ *         description: Invalid pagination parameters
+ *       500:
+ *         description: Server error
  */
 router.get('/recent', async (req, res) => {
   try {
@@ -281,9 +380,36 @@ router.get('/recent', async (req, res) => {
 });
 
 /**
- * @route   GET /api/leaderboard/session/:id
- * @desc    Get scores for a specific session
- * @access  Public
+ * @swagger
+ * /leaderboard/session/{id}:
+ *   get:
+ *     summary: Get scores for a specific session
+ *     tags: [Leaderboard]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Session ID
+ *     responses:
+ *       200:
+ *         description: Scores for the session
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 sessionId:
+ *                   type: string
+ *                 playerCount:
+ *                   type: integer
+ *                 scores:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/LeaderboardEntry'
+ *       500:
+ *         description: Server error
  */
 router.get('/session/:id', async (req, res) => {
   try {
@@ -322,9 +448,20 @@ router.get('/session/:id', async (req, res) => {
 });
 
 /**
- * @route   GET /api/leaderboard/stats
- * @desc    Get leaderboard statistics
- * @access  Public
+ * @swagger
+ * /leaderboard/stats:
+ *   get:
+ *     summary: Get leaderboard statistics
+ *     tags: [Leaderboard]
+ *     responses:
+ *       200:
+ *         description: Leaderboard statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LeaderboardStats'
+ *       500:
+ *         description: Server error
  */
 router.get('/stats', async (req, res) => {
   try {
@@ -389,3 +526,113 @@ async function calculateRank(score) {
 }
 
 module.exports = router;
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     ScoreSubmission:
+ *       type: object
+ *       required:
+ *         - alias
+ *         - score
+ *         - sessionId
+ *       properties:
+ *         alias:
+ *           type: string
+ *           minLength: 2
+ *           maxLength: 20
+ *           pattern: "^[a-zA-Z0-9_\\- ]+$"
+ *         phone:
+ *           type: string
+ *           pattern: "^\\+?[0-9]{10,15}$"
+ *         score:
+ *           type: integer
+ *           minimum: 0
+ *           maximum: 100000
+ *         sessionId:
+ *           type: string
+ *           format: uuid
+ *         gameDate:
+ *           type: string
+ *           format: date-time
+ *         metadata:
+ *           type: object
+ *           properties:
+ *             questionCount:
+ *               type: integer
+ *             difficulty:
+ *               type: string
+ *               enum: [easy, medium, hard, mixed]
+ *             categories:
+ *               type: array
+ *               items:
+ *                 type: string
+ *             timeSpent:
+ *               type: number
+ *             device:
+ *               type: string
+ *     ScoreResponse:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         alias:
+ *           type: string
+ *         score:
+ *           type: integer
+ *         rank:
+ *           type: integer
+ *     LeaderboardEntry:
+ *       type: object
+ *       properties:
+ *         rank:
+ *           type: integer
+ *         alias:
+ *           type: string
+ *         score:
+ *           type: integer
+ *         date:
+ *           type: string
+ *           format: date-time
+ *         metadata:
+ *           type: object
+ *     Pagination:
+ *       type: object
+ *       properties:
+ *         page:
+ *           type: integer
+ *         limit:
+ *           type: integer
+ *         totalItems:
+ *           type: integer
+ *         totalPages:
+ *           type: integer
+ *         hasNextPage:
+ *           type: boolean
+ *         hasPrevPage:
+ *           type: boolean
+ *     LeaderboardStats:
+ *       type: object
+ *       properties:
+ *         totalEntries:
+ *           type: integer
+ *         topScore:
+ *           type: object
+ *           properties:
+ *             score:
+ *               type: integer
+ *             alias:
+ *               type: string
+ *         averageScore:
+ *           type: integer
+ *         activity:
+ *           type: object
+ *           properties:
+ *             daily:
+ *               type: integer
+ *             weekly:
+ *               type: integer
+ *             monthly:
+ *               type: integer
+ */
